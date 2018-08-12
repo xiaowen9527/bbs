@@ -20,7 +20,12 @@
                                 </div>
                             </div>
                         </li>
+                        <p v-show='more' class="more" @click="handleClickMore">点击加载更多</p>
+                        <p v-show='onMore' class="more">正在加载。。。</p>
+                        <p v-show='noMore' class="more">暂无更多数据</p>
                     </ul>
+
+
 
         </van-tab>
     </van-tabs>
@@ -33,10 +38,14 @@ export default {
   data() {
     return {
       active: 0,
-      tab:'all',
-      page:1,
-      limit:10,
-      list:[],
+      index:0,
+      tab: "all",
+      page: 1,
+      more: false,
+      onMore:false,
+      noMore:false,
+      limit: 10,
+      list: [],
       theme_menu: [
         { name: "全部", tab: "all" },
         { name: "精华", tab: "good" },
@@ -48,33 +57,47 @@ export default {
     };
   },
   mounted() {
-      this.getDataList()
+    this.onMore = true
+    this.getDataList();
   },
   methods: {
-      handleClick(index){
-        this.page = 1
-        this.list = []
-        this.tab = this.theme_menu[index].tab
-        this.getDataList()
-      },
-      getDataList(){
-          this.$axios.get('/api/v1/topics',{
-              params:{
-                  tab:this.tab,
-                  page:this.page,
-                  limit:this.limit
-              }
-          })
-            .then(res=>{
-                
-                if(res.status && res.data){
-                    const data = res.data.data
-                    this.list = this.list.concat(data)
-                }
-                console.log(this.list);
-            })
-      },
-      tagDeal(data, top) {
+    handleClick(index) {
+      if (index != this.index) {
+        this.page = 1;
+        this.list = [];
+        this.tab = this.theme_menu[index].tab;
+        this.more = false
+        this.onMore = true
+        this.noMore = false
+        this.getDataList();
+        this.index = index
+      }
+    },
+    getDataList() {
+      this.$axios
+        .get("/api/v1/topics", {
+          params: {
+            tab: this.tab,
+            page: this.page,
+            limit: this.limit
+          }
+        })
+        .then(res => {
+          if (res.status && res.data) {
+            const data = res.data.data;
+            this.list = this.list.concat(data);
+            if(data.length<10){
+                this.more = false
+                this.noMore = true
+            }else{
+                this.more = true
+            }
+          }
+          this.onMore = false
+          console.log(this.more);
+        });
+    },
+    tagDeal(data, top) {
       switch (data) {
         case "share":
           if (top) {
@@ -93,6 +116,12 @@ export default {
           return "问答";
           break;
       }
+    },
+    handleClickMore(){
+        this.page++
+        this.more = false
+        this.onMore = true
+        this.getDataList()      
     }
   }
 };
@@ -109,6 +138,10 @@ export default {
     top 1rem
 .theme-list
     padding 1rem 0
+    .more
+        text-align center
+        line-height .8rem
+        color #c6c6c6
     .list
         padding 0.2rem
         border-bottom 1px solid #ccc
