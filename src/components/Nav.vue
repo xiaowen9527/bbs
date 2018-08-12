@@ -5,10 +5,10 @@
                 <router-link to="/" class="item" tag="a">首页</router-link>
             </li>
             <li class="item-li">
-                <router-link to="/1" class="item" tag="a">消息</router-link>
+                <router-link to="/message" class="item" tag="a">消息</router-link>
             </li>
             <li class="item-li">
-                <router-link to="/2" class="item" tag="a">我的</router-link>
+                <router-link to="/mine" class="item" tag="a">我的</router-link>
             </li>
         </ul>
     </div>
